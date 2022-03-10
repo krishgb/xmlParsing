@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+    body{
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    h2{
+        background: -webkit-linear-gradient(45deg, blue, red);
+        background: linear-gradient(45deg, red, blue, lightgreen, yellow);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        font-size: 3rem;
+        text-align: center;
+    }
+    </style>
+</head>
+<body>
+    
+    <h2>XML Parsing</h2>
+    <span>Filter by</span>
+    <select>
+        <option value="rollno">Roll no</option>
+        <option value="email">Email</option>
+        <option value="name">Name</option>
+        <option value="gender">Gender</option>
+        <option value="dept">Department</option>
+        <option value="city">City</option>
+    </select>
+    <input type="text" placeholder="Search...">
+    <table>
+        <thead>
+            <tr>
+                <th>Roll No</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Gender</th>
+                <th>Department</th>
+                <th>City</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script src="data.js"></script>
+    <script>
+        let data = ''
+        let showElements = []
+        const table = document.querySelector('tbody'),
+        selector = document.querySelector('select'),
+        input = document.querySelector('input')
+
+        const xmlParser = new DOMParser()
+
+
+        document.addEventListener('DOMContentLoaded', () => {            
+            const xmlData = xmlParser.parseFromString(studentsData, 'text/xml')
+            console.log(xmlData)
+            const students = xmlData.querySelectorAll('student')
+            students.forEach(
+                student => {
+                    const s = {
+                        name: student.querySelector('name').textContent,
+                        rollno: student.querySelector('rollno').textContent,
+                        email: student.querySelector('email').textContent,
+                        gender: student.querySelector('gender').textContent,
+                        dept: student.querySelector('dept').textContent,
+                        city: student.querySelector('city').textContent,
+                    }
+                    createTable(s)
+                }
+            )
+        })
+
+        const createTd = (data, parent, id) => {
+            const td = document.createElement('td')
+            td.textContent = data
+            td.id = id
+            parent.appendChild(td)
+        }
+
+        const createTable = data => {
+
+            const tr = document.createElement('tr')
+            createTd(data.rollno, tr, 'rollno')    
+            createTd(data.name, tr, 'name')    
+            createTd(data.email, tr, 'email')    
+            createTd(data.gender, tr, 'gender')    
+            createTd(data.dept, tr, 'dept')    
+            createTd(data.city, tr, 'city')
+            table.appendChild(tr)
+        }
+
+        input.onkeyup = (e) => {
+            
+            const filterBy = selector.value
+            const inputValue = input.value
+            const datas = document.querySelectorAll(`#${filterBy}`)
+
+            if(inputValue.trim().length === 0){
+                for(let i of datas)
+                        i.parentElement.hidden = false        
+            }else{
+                for(let i of datas)
+                    if(!i.textContent.toLowerCase().includes(inputValue.toLowerCase().trim()))
+                        i.parentElement.hidden = true
+            }
+        }
+    </script>
+</body>
+</html>
